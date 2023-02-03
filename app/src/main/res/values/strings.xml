@@ -12,4 +12,5 @@
     <string name="menu_gallery">Galeria</string>
     <string name="menu_camera">Câmara</string>
     <string name="menu_map">Mapa</string>
+    <string name="BtPhoto">tirar foto</string>
 </resources>
