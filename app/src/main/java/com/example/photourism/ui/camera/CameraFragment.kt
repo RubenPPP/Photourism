@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.camera.core.ImageCapture
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.photourism.databinding.FragmentCameraBinding
@@ -12,6 +13,8 @@ import com.example.photourism.databinding.FragmentCameraBinding
 class CameraFragment : Fragment() {
 
     private var _binding: FragmentCameraBinding? = null
+    private var imageCapture: ImageCapture? = null
+    private lateinit var cameraExecutor: ExecutorService
 
     // This property is only valid between onCreateView and
     // onDestroyView.
