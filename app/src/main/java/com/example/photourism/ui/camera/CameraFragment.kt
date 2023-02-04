@@ -131,10 +131,9 @@ public class CameraFragment : Fragment() {
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture
-        Toast.makeText(context!!, "TOOK PHOTO?!", Toast.LENGTH_SHORT).show()
         // Create timestamped output file to hold the image
-        val photoFile = File(outputDirectory, SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg")
-
+        Toast.makeText(context, outputDirectory.toString(), Toast.LENGTH_SHORT).show()
+        val photoFile = File(outputDirectory, SimpleDateFormat(FILENAME_FORMAT, Locale.UK).format(System.currentTimeMillis()) + ".jpg")
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
@@ -142,7 +141,6 @@ public class CameraFragment : Fragment() {
         // been taken
         imageCapture!!.takePicture(outputOptions, ContextCompat.getMainExecutor(context!!), object : ImageCapture.OnImageSavedCallback {
             override fun onError(exc: ImageCaptureException) {
-                Toast.makeText(context!!, "Doesn't fucking work", Toast.LENGTH_SHORT).show()
                 Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
             }
 

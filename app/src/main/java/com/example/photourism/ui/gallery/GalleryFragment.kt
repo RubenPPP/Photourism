@@ -3,16 +3,14 @@ package com.example.photourism.ui.gallery
 
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.photourism.R
 import com.example.photourism.databinding.FragmentGalleryBinding
 import java.io.File
@@ -33,21 +31,21 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
     ): View {
         val root = inflater.inflate(R.layout.fragment_gallery, container, false)
 
-         val grid = root.findViewById<GridView>(R.id.galleryGrid)
+        val grid = root.findViewById<GridView>(R.id.galleryGrid)
 
-        readDirectory(grid)
+        val gridItemArrayList: ArrayList<GridItem> = ArrayList <GridItem>()
+        File(getOutputDirectory().toString()).walk().forEach {
+            if (it.path.endsWith(".jpg")) {
+                Log.v("Found File", "Found file -> $it")
+                gridItemArrayList.add(GridItem(it.name, it.absolutePath))
+                var i = 0
+                Log.v("GridItem", "Item -> " + gridItemArrayList[i++])
+            }
+        }
+        val adapter = GridViewAdapter(this.context!!, gridItemArrayList)
+        grid.adapter = adapter
         return root
 
-   }
-
-   fun  readDirectory(gridView: GridView){
-       File(getString(R.string.GalleryDir)).walk().forEach {
-
-           if (it.endsWith(".jpg")) {
-               val myBitmap = BitmapFactory.decodeFile(it.getAbsolutePath())
-               displayImg(myBitmap, gridView)
-           }
-       }
    }
 
    fun displayImg( img : Bitmap, gridView: GridView) {
@@ -63,4 +61,11 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
        super.onDestroyView()
        _binding = null
    }
+
+    fun getOutputDirectory(): File {
+        val mediaDir = activity?.externalMediaDirs?.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else activity?.filesDir!!
+    }
 }
