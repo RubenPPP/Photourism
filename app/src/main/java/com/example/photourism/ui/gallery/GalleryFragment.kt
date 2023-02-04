@@ -1,15 +1,24 @@
 package com.example.photourism.ui.gallery
 
+
+
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.GridView
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.photourism.R
 import com.example.photourism.databinding.FragmentGalleryBinding
+import java.io.File
 
-class GalleryFragment : Fragment() {
+
+class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
     private var _binding: FragmentGalleryBinding? = null
 
@@ -22,21 +31,36 @@ class GalleryFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-        val galleryViewModel =
-                ViewModelProvider(this).get(GalleryViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_gallery, container, false)
 
-        _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+         val grid = root.findViewById<GridView>(R.id.galleryGrid)
 
-        val textView: TextView = binding.textGallery
-        galleryViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
+        readDirectory(grid)
         return root
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+   }
+
+   fun  readDirectory(gridView: GridView){
+       File(getString(R.string.GalleryDir)).walk().forEach {
+
+           if (it.endsWith(".jpg")) {
+               val myBitmap = BitmapFactory.decodeFile(it.getAbsolutePath())
+               displayImg(myBitmap, gridView)
+           }
+       }
+   }
+
+   fun displayImg( img : Bitmap, gridView: GridView) {
+       val newView: ImageView = ImageView(this.context)
+
+        newView.setImageBitmap(img)
+        gridView.addView(newView)
+
+        newView.layoutParams.height = 200
+        newView.layoutParams.width = 200
+   }
+   override fun onDestroyView() {
+       super.onDestroyView()
+       _binding = null
+   }
 }
