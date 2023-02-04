@@ -71,8 +71,9 @@ public class CameraFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        if (::cameraExecutor.isInitialized)
+            cameraExecutor.shutdown()
         super.onDestroyView()
-        cameraExecutor.shutdown()
         viewBinding = null
     }
 
