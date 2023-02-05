@@ -22,4 +22,11 @@
         android:name="com.example.photourism.ui.map.MapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_map" />
+
+    <fragment
+        android:id="@+id/nav_info"
+        android:name="com.example.photourism.ui.info.InfoFragment"
+        android:label="@string/menu_info"
+        tools:layout="@layout/fragment_info" />
+
 </navigation>

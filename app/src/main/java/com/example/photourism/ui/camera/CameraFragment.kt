@@ -30,6 +30,7 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 
 
+
 public class CameraFragment : Fragment() {
 
     private var viewBinding: FragmentCameraBinding? = null
@@ -50,7 +51,7 @@ public class CameraFragment : Fragment() {
         val cameraViewModel =
             ViewModelProvider(this)[CameraViewModel::class.java]
         outputDirectory = getOutputDirectory()
-        // Request camera permissions
+        // Pedir permissões de camera
         if (allPermissionsGranted()) {
             startCamera()
             gps = GPSLocator(requireContext())
