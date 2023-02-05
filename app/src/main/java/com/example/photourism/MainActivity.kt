@@ -20,6 +20,7 @@ import com.example.photourism.ui.camera.CameraFragment
 import com.example.photourism.ui.camera.CameraViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
