@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,7 +19,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.compass.CompassOverlay
@@ -74,15 +71,18 @@ class MapFragment : Fragment() {
         Configuration.getInstance().setUserAgentValue(context!!.packageName)
 
         map.setTileSource(TileSourceFactory.MAPNIK)
-        map.controller.zoomTo(10.0)
+        map.controller.zoomTo(10.0) //zoom inicial
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
         map.setMultiTouchControls(true) // para poder fazer zoom com os dedos
 
+        //Overlay de bussola
         var compassOverlay = CompassOverlay(context, map)
         compassOverlay.enableCompass()
         map.overlays.add(compassOverlay)
 
         Toast.makeText(this.context, "A carregar...", Toast.LENGTH_SHORT).show()
+
+        //Teste inicial de coordenadas
         /*
         var point = GeoPoint(39.60068, -8.38967)       // 39.60199, -8.39675
         Handler(Looper.getMainLooper()).postDelayed({
@@ -105,7 +105,7 @@ class MapFragment : Fragment() {
         locationOverlay!!.enableMyLocation();
     }
 
-
+    //verificação de permissões
     private fun requestPermissionsIfNecessary(permissions: Array<out String>){
         val permissionsToRequest = ArrayList<String>();
         permissions.forEach { permission ->
@@ -126,6 +126,7 @@ class MapFragment : Fragment() {
         }
     }
 
+    //Função que obtem a posição do utilizador de forma a auto centrar
     @SuppressLint("MissingPermission")
     fun getLastKnownLocation(map : MapView){
         println("pre location")

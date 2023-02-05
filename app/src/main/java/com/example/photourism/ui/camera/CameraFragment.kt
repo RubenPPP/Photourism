@@ -45,7 +45,7 @@ public class CameraFragment : Fragment() {
         val cameraViewModel =
             ViewModelProvider(this)[CameraViewModel::class.java]
         outputDirectory = getOutputDirectory()
-        // Request camera permissions
+        // Pedir permissões de camera
         if (allPermissionsGranted()) {
             startCamera()
         } else {
