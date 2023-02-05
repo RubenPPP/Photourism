@@ -14,4 +14,6 @@
     <string name="menu_map">Mapa</string>
     <string name="BtPhoto">tirar foto</string>
     <string name="GalleryDir"> file:///storage/emulated/0/Android/media/com.example.photourism/Photourism/</string>
+    <string name="menu_info">Info</string>
+    <string name="info_autores">Autores</string>
 </resources>
