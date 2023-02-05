@@ -24,6 +24,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.io.File
 
 
 class MapFragment : Fragment() {
@@ -157,6 +158,17 @@ class MapFragment : Fragment() {
             )
         })
         map.overlayManager.add(locationOverlay)
+    }
+
+    fun getOutputDirectory(): File {
+        val mediaDir = activity?.externalMediaDirs?.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else activity?.filesDir!!
+    }
+
+    fun loadMarkers() {
+
     }
     override fun onDestroyView() {
         super.onDestroyView()

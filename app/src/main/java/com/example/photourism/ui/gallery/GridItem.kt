@@ -2,19 +2,19 @@ package com.example.photourism.ui.gallery
 
 class GridItem (private var name: String, private var path: String) {
 
-    fun getName(): String {
+    public fun getName(): String {
         return name
     }
 
-    fun setName(name: String) {
+    public fun setName(name: String) {
         this.name = name
     }
 
-    fun getPath(): String {
+    public fun getPath(): String {
         return path
     }
 
-    fun setPath(path: String) {
+    public fun setPath(path: String) {
         this.path = path
     }
 }

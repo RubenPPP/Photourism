@@ -3,6 +3,8 @@ package com.example.photourism.ui.camera
 import android.Manifest
 import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
+import android.location.Location
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -20,11 +22,14 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.photourism.GPSLocator
 import com.example.photourism.R
 import com.example.photourism.databinding.FragmentCameraBinding
 import java.io.File
 import java.util.*
 import java.util.concurrent.ExecutorService
+
+
 
 public class CameraFragment : Fragment() {
 
@@ -32,6 +37,7 @@ public class CameraFragment : Fragment() {
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var outputDirectory: File
+    private lateinit var gps: GPSLocator
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -48,14 +54,19 @@ public class CameraFragment : Fragment() {
         // Pedir permissões de camera
         if (allPermissionsGranted()) {
             startCamera()
+            gps = GPSLocator(requireContext())
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
-        viewBinding!!.takePhotoBt.setOnClickListener { takePhoto() }
+        viewBinding!!.takePhotoBt.setOnClickListener {
+            if (allPermissionsGranted())
+                takePhoto()
+        }
+
         return root
     }
 
-    fun getOutputDirectory(): File {
+    private fun getOutputDirectory(): File {
         val mediaDir = activity?.externalMediaDirs?.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
         }
@@ -75,6 +86,7 @@ public class CameraFragment : Fragment() {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 startCamera()
+                gps = GPSLocator(requireContext())
             } else {
                 Toast.makeText(viewBinding!!.root.context,
                     "Permissions not granted by the user.",
@@ -126,7 +138,8 @@ public class CameraFragment : Fragment() {
         val imageCapture = imageCapture
         // Create timestamped output file to hold the image
         Toast.makeText(context, outputDirectory.toString(), Toast.LENGTH_SHORT).show()
-        val photoFile = File(outputDirectory, SimpleDateFormat(FILENAME_FORMAT, Locale.UK).format(System.currentTimeMillis()) + ".jpg")
+        val photoName = SimpleDateFormat(FILENAME_FORMAT, Locale.UK).format(System.currentTimeMillis()) + ".jpg"
+        val photoFile = File(outputDirectory, photoName)
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
@@ -137,13 +150,37 @@ public class CameraFragment : Fragment() {
                 Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
             }
 
+            @RequiresApi(Build.VERSION_CODES.Q)
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                 val savedUri = Uri.fromFile(photoFile)
+
+                val location: Location = gps.GetLocation()
+
+                var exif: ExifInterface = ExifInterface(photoFile)
+
+                exif!!.setAttribute(ExifInterface.TAG_GPS_LATITUDE, dec2DMS(location.latitude))
+                exif!!.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, dec2DMS(location.longitude))
+                exif!!.saveAttributes()
+
+                println("Meta -> " + exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE))
+                println("Meta -> " + exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE))
+
                 val msg = "Photo capture succeeded: $savedUri"
                 Toast.makeText(context!!, msg, Toast.LENGTH_SHORT).show()
                 Log.d(TAG, msg)
             }
         })
+    }
+
+    fun dec2DMS(coord: Double): String? {
+        var coord = coord
+        coord = if (coord > 0) coord else -coord // -105.9876543 -> 105.9876543
+        var sOut = Integer.toString(coord.toInt()) + "/1," // 105/1,
+        coord = coord % 1 * 60 // .987654321 * 60 = 59.259258
+        sOut = sOut + Integer.toString(coord.toInt()) + "/1," // 105/1,59/1,
+        coord = coord % 1 * 60000 // .259258 * 60000 = 15555
+        sOut = sOut + Integer.toString(coord.toInt()) + "/1000" // 105/1,59/1,15555/1000
+        return sOut
     }
 
     companion object {
@@ -153,7 +190,9 @@ public class CameraFragment : Fragment() {
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
                 Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             ).apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
