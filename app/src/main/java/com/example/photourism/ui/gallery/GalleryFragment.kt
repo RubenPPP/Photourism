@@ -60,7 +60,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             grid.setOnItemClickListener { adapterView, view, position, id ->
                 println("CLICKED -> " + gridItemArrayList[position].getName())
 
-                Navigation.findNavController(view).navigate(R.id.nav_map);
+                //Navigation.findNavController(view).navigate(R.id.nav_map);
             }
         }
 
